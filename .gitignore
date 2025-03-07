@@ -1,0 +1,31 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+
+# Local
+.DS_Store
+*.local
+*.log*
+
+# Dist
+node_modules
+dist/
+.vinxi
+.output
+.vercel
+.netlify
+.wrangler
+
+# IDE
+!.vscode/extensions.json
+.idea
+
+.env
