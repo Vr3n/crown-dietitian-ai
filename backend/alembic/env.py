@@ -6,7 +6,9 @@ from sqlmodel import SQLModel
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
+
 from app.config import settings
+from app import models
 
 from alembic import context
 
