@@ -12,6 +12,8 @@
             "~/*": [
                 "./src/*"
             ]
-        }
+        },
+        // for openapi-react-query.
+        "noUncheckedIndexedAccess": true
     }
 }

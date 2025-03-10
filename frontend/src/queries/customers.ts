@@ -1,15 +1,14 @@
-import { queryOptions, useQuery } from "@tanstack/react-query";
+import createFetchClient from "openapi-fetch";
+import createClient from "openapi-react-query";
 
-const fetchCustomers = async () => {
-  const response = await fetch("http://127.0.0.1:8000/customers/?skip=0&limit=100");
-  if (!response.ok) {
-    console.log(response)
-    throw new Error("Failed to fetch customers.");
-  }
-  return response.json();
-};
+import type { paths } from "~/lib/api/v1";
 
-export const useCustomers = queryOptions({
-  queryKey: ["customers"],
-  queryFn: () => fetchCustomers(),
+const fetchClient = createFetchClient<paths>({
+  baseUrl: "http://127.0.0.1:8000/",
+});
+
+const $api = createClient(fetchClient);
+
+export const getCustomers = $api.queryOptions("get", "/customers/", {
+  params: { query: { skip: 0, limit: 100 } },
 });

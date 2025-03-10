@@ -36,13 +36,13 @@ import {
 } from "~/components/ui/table";
 import { CustomerForm } from "~/components/customer-form";
 import ModalFormContainer from "~/components/modal-form-container";
-import { useCustomers } from "~/queries/customers";
+import { getCustomers } from "~/queries/customers";
 import SheetFormContainer from "~/components/sheet-form-container";
 
 export const Route = createFileRoute("/clients/")({
   component: RouteComponent,
   loader: ({ context: { queryClient } }) =>
-    queryClient.ensureQueryData(useCustomers),
+    queryClient.ensureQueryData(getCustomers),
 });
 
 export type Customer = {
@@ -123,7 +123,7 @@ const columns: ColumnDef<Customer>[] = [
 ];
 
 function RouteComponent() {
-  const customerData = Route.useLoaderData();
+  const customerData = Route.useLoaderData() as Customer[];
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
