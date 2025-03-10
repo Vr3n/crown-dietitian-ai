@@ -31,7 +31,7 @@ async def get_customer_service(session: AsyncSession = Depends(get_session)) -> 
     return CustomerService(CustomerMaster, session)
 
 
-@router.get("/", response_model=CustomerPublicResponse)
+@router.get("/", response_model=List[CustomerPublicResponse])
 async def get_all_customers(skip: int = Query(0, ge=0, description="Number of customers to skip."),
                             limit: int = Query(
                                 100, ge=1, le=100, description="Maximum number of customers to return."),
@@ -48,7 +48,8 @@ async def get_all_customers(skip: int = Query(0, ge=0, description="Number of cu
         List[CustomerPublic]: List of customers.
     """
 
-    return await service.get_all(skip=skip, limit=limit)
+    result = await service.get_all(skip=skip, limit=limit)
+    return result
 
 
 @router.post("/", response_model=CustomerPublicResponse,

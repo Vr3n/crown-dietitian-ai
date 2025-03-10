@@ -2,7 +2,8 @@
 from datetime import date
 from typing import Any, Dict
 from uuid import UUID
-from sqlalchemy import JSON, Column
+from pydantic import EmailStr, field_validator
+from sqlalchemy import JSON, VARCHAR, Column
 from sqlmodel import Field, SQLModel
 
 from app.enums import Gender
@@ -16,8 +17,12 @@ class CustomerBase(SQLModel):
     name: str
     date_of_birth: date
     gender: Gender
-    email: str | None = None
-    alternate_email: str | None = None
+    email: EmailStr | None = Field(
+        sa_column=Column('email', VARCHAR, nullable=True, unique=True,
+                         default=None))
+    alternate_email: str | None = Field(
+        sa_column=Column('alternate_email', VARCHAR, nullable=True, unique=True,
+                         default=None))
     mobile_number: str | None = None
     alternate_mobile_number: str | None = None
 
@@ -31,6 +36,19 @@ class CustomerBase(SQLModel):
             (today.month, today.day) < (
                 self.date_of_birth.month, self.date_of_birth.day)
         ), 2)
+
+    @field_validator('mobile_number')
+    def mobile_validator(cls, v: str) -> str:
+        if not v.isdigit() or len(v) != 10:
+            raise ValueError("Mobile number must be exactly 10 digits.")
+        return v
+
+    @field_validator('alternate_mobile_number')
+    def alternate_mobile_validator(cls, v: str | None) -> str | None:
+        if type(v) == str:
+            if not v.isdigit() or len(v) != 10:
+                raise ValueError("Mobile number must be exactly 10 digits.")
+            return v
 
 
 class BodyMeasurementBase(SQLModel):
@@ -129,4 +147,3 @@ class DiseaseBase(HealthConditionBase):
     diagnosis_date: date | None = None
     medications: Dict[str, Any] = Field(default={}, sa_column=Column(JSON))
     impact_on_diet: Dict[str, Any] = Field(default={}, sa_column=Column(JSON))
-
