@@ -51,7 +51,7 @@ const data = {
       items: [
         {
           title: "All Clients",
-          url: "#",
+          url: "clients/",
         },
         {
           title: "Diets",

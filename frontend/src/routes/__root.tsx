@@ -1,6 +1,11 @@
 import * as React from "react";
-import { Outlet, createRootRoute } from "@tanstack/react-router";
+import {
+  Outlet,
+  createRootRoute,
+  createRootRouteWithContext,
+} from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import { AppSidebar } from "~/components/app-sidebar";
 import {
@@ -17,10 +22,14 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "~/components/ui/sidebar";
+import { Toaster } from "~/components/ui/sonner";
+import { QueryClient } from "@tanstack/react-query";
 
-export const Route = createRootRoute({
-  component: RootComponent,
-});
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
+  {
+    component: RootComponent,
+  }
+);
 
 function RootComponent() {
   return (
@@ -47,9 +56,13 @@ function RootComponent() {
             </Breadcrumb> */}
             </div>
           </header>
-          <Outlet />
+          <main className="p-4">
+            <Outlet />
+          </main>
+          <Toaster />
         </SidebarInset>
       </SidebarProvider>
+      <ReactQueryDevtools buttonPosition="top-right" />
       <TanStackRouterDevtools position="bottom-right" />
     </>
   );
