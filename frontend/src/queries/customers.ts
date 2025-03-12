@@ -7,8 +7,5 @@ const fetchClient = createFetchClient<paths>({
   baseUrl: "http://127.0.0.1:8000/",
 });
 
-const $api = createClient(fetchClient);
+export const $api = createClient(fetchClient);
 
-export const getCustomers = $api.queryOptions("get", "/customers/", {
-  params: { query: { skip: 0, limit: 100 } },
-});

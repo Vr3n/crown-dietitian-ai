@@ -5,7 +5,7 @@ import { routeTree } from "./routeTree.gen";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // query client - tanstack query.
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
 // Set up a Router instance
 const router = createRouter({

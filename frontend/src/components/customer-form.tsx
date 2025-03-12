@@ -8,14 +8,19 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { cn } from "~/lib/utils";
 import { CalendarIcon, CheckCircle2, Loader2 } from "lucide-react";
 import { Calendar } from "./ui/calendar";
-import { Customer } from "~/routes/clients";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
-import { toast } from "sonner";
+
+import type { CustomerCreate } from "~/customers/types";
 
 const customerSchema = z.object({
   name: z.string().min(2, { message: "Name is required." }),
-  date_of_birth: z.date(),
-  gender: z.enum(["Male", "Female", "Other"]),
+  date_of_birth: z
+    .string()
+    .refine(
+      (date) => !isNaN(Date.parse(date)),
+      "Invalid date format (expected yyyy-MM-dd)"
+    ),
+  gender: z.enum(["male", "female", "OTHER"]),
   email: z.string().email("Invalid email format").nullable().or(z.literal("")),
   alternate_email: z
     .string()
@@ -30,27 +35,32 @@ const customerSchema = z.object({
     .regex(/^\d{10}$/, "Mobile Number must be 10 digits")
     .nullable()
     .or(z.literal("")),
+  allergies: z.object({}),
+  preferences: z.object({}),
 });
 
 type CustomerFormProps = {
   onOpenChange: (open: boolean) => void;
-  onSave: (customer: Customer) => void;
+  onSave: (customer: CustomerCreate) => void;
 };
 
 export function CustomerForm({ onOpenChange, onSave }: CustomerFormProps) {
   const form = useForm({
     defaultValues: {
       name: "",
-      date_of_birth: new Date(),
-      gender: "Male" as "Male" | "Female" | "Other",
+      date_of_birth: format(new Date(), "yyyy-MM-dd"),
+      gender: "male" as "male" | "female" | "OTHER",
       email: "" as string | null,
       alternate_email: "" as string | null,
       mobile_number: "",
       alternate_mobile_number: "" as string | null,
+      allergies: {},
+      preferences: {},
     },
     onSubmit: async ({ value }) => {
       const formattedValues = {
         ...value,
+        date_of_birth: format(new Date(value.date_of_birth), "yyyy-MM-dd"),
         email: value.email === "" ? null : value.email,
         alternate_email:
           value.alternate_email === "" ? null : value.alternate_email,
@@ -59,11 +69,12 @@ export function CustomerForm({ onOpenChange, onSave }: CustomerFormProps) {
             ? null
             : value.alternate_mobile_number,
       };
-      toast(`${formattedValues.name} added.`);
-      onSave(formattedValues as Customer);
+      console.log(formattedValues, "Customer Payload: ");
+      onSave(formattedValues as CustomerCreate);
     },
     validators: {
       onMount: customerSchema,
+      onChange: customerSchema,
     },
   });
 
@@ -144,7 +155,7 @@ export function CustomerForm({ onOpenChange, onSave }: CustomerFormProps) {
                           const formattedDate = date
                             ? format(date, "yyyy-MM-dd")
                             : "";
-                          return field.handleChange(new Date(formattedDate));
+                          return field.handleChange(formattedDate);
                         }}
                         fromYear={1947}
                         toYear={new Date().getFullYear()}
@@ -177,20 +188,20 @@ export function CustomerForm({ onOpenChange, onSave }: CustomerFormProps) {
                 <RadioGroup
                   value={field.state.value}
                   onValueChange={(value) =>
-                    field.handleChange(value as "Male" | "Female" | "Other")
+                    field.handleChange(value as "male" | "female" | "OTHER")
                   }
                   className="flex space-x-4"
                 >
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Male" id="male" />
+                    <RadioGroupItem value="male" id="male" />
                     <Label htmlFor="male">Male</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Female" id="female" />
+                    <RadioGroupItem value="female" id="female" />
                     <Label htmlFor="female">Female</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Other" id="other" />
+                    <RadioGroupItem value="OTHER" id="other" />
                     <Label htmlFor="other">Other</Label>
                   </div>
                 </RadioGroup>

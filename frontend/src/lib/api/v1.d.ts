@@ -307,6 +307,7 @@ export interface components {
         };
         /** CustomerPublicResponse */
         CustomerPublicResponse: {
+            id: string;
             /** Name */
             name: string;
             /**
