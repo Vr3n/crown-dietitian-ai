@@ -25,6 +25,33 @@ export const customerFetchClient = {
     });
     return handleRepsonse<Customer>(res);
   },
+  deleteCustomer: async (id: string) => {
+    const response = await fetch(`${BASE_URL}/customers/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    // Handle no content response
+    if (response.status === 204) {
+      return true;
+    }
+
+    return handleRepsonse<{ success: boolean }>(response);
+  },
+  // Update customer
+  updateCustomer: async (id: string, customer: Partial<CustomerCreate>) => {
+    const response = await fetch(`${BASE_URL}/customers/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(customer),
+    });
+
+    return handleRepsonse<Customer>(response);
+  },
 };
 
 export const customerKeys = {

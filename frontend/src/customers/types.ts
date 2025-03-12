@@ -1,6 +1,6 @@
 export type CustomerBase = {
   name: string;
-  date_of_birth: Date;
+  date_of_birth: string;
   gender: "male" | "female" | "OTHER";
   email: string | null;
   alternate_email: string | null;
@@ -15,8 +15,4 @@ export type Customer = CustomerBase & {
   created_at: string;
 };
 
-export type CustomerCreate = CustomerBase & {
-  date_of_birth: string;
-};
-
-
+export type CustomerCreate = CustomerBase;

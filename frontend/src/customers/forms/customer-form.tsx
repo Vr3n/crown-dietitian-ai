@@ -19,21 +19,28 @@ import { customerSchema } from "../schemas";
 type CustomerFormProps = {
   onOpenChange: (open: boolean) => void;
   onSave: (customer: CustomerCreate) => void;
+  defaultValues?: CustomerCreate;
 };
 
-export function CustomerForm({ onOpenChange, onSave }: CustomerFormProps) {
+const defaultCustomerValues = {
+  name: "",
+  date_of_birth: format(new Date(), "yyyy-MM-dd"),
+  gender: "male" as "male" | "female" | "OTHER",
+  email: "" as string | null,
+  alternate_email: "" as string | null,
+  mobile_number: "",
+  alternate_mobile_number: "" as string | null,
+  allergies: {},
+  preferences: {},
+};
+
+export function CustomerForm({
+  onOpenChange,
+  onSave,
+  defaultValues = defaultCustomerValues,
+}: CustomerFormProps) {
   const form = useForm({
-    defaultValues: {
-      name: "",
-      date_of_birth: format(new Date(), "yyyy-MM-dd"),
-      gender: "male" as "male" | "female" | "OTHER",
-      email: "" as string | null,
-      alternate_email: "" as string | null,
-      mobile_number: "",
-      alternate_mobile_number: "" as string | null,
-      allergies: {},
-      preferences: {},
-    },
+    defaultValues: defaultValues,
     onSubmit: async ({ value }) => {
       const formattedValues = {
         ...value,

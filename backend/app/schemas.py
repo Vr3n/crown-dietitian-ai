@@ -13,7 +13,6 @@ class CustomerBase(SQLModel):
     """
     Represents a Client Receving Nutritionist Guidance.
     """
-
     name: str
     date_of_birth: date
     gender: Gender

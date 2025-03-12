@@ -5,7 +5,9 @@ export type FormContainerProps<T> = {
   FormComponent: React.ComponentType<{
     onOpenChange: (open: boolean) => void;
     onSave: (payload: T) => void;
+    defaultValues?: T;
   }>;
+  defaultValues?: T;
   onOpenChange: (open: boolean) => void;
   onSave: (payload: T) => void;
 };

@@ -11,10 +11,12 @@ import CustomerTable from "~/customers/customer-table/customer-table";
 import {
   useCreateCustomerMutation,
   useCustomersQuery,
+  useDeleteCustomerMutation,
+  useUpdateCustomerMutation,
 } from "~/customers/hooks/form-hooks";
 import SheetFormContainer from "~/components/form-containers/sheet-form-container";
 import { CustomerForm } from "~/customers/forms/customer-form";
-import { queryClient } from "~/main";
+import CustomerTableSkeleton from "~/customers/customer-table/skeleton";
 
 export const Route = createFileRoute("/clients/")({
   component: RouteComponent,
@@ -22,6 +24,7 @@ export const Route = createFileRoute("/clients/")({
     // Defining customer query key.
     return queryClient.ensureQueryData(customerQueries.getCustomers());
   },
+  pendingComponent: CustomerTableSkeleton,
   errorComponent: ErrorComponent,
 });
 
@@ -45,23 +48,35 @@ function RouteComponent() {
     setIsFormOpen(true);
   };
 
+  // Update and Delete Mutation
+  const updateMutation = useUpdateCustomerMutation();
+  const deleteMutation = useDeleteCustomerMutation();
+
+  const handleDeleteCustomer = (id: string) => {
+    deleteMutation.mutate(id);
+  };
+
+  const handleEditingCustomer = (customer: Customer) => {
+    setEditingCustomer(customer);
+    setIsFormOpen(true);
+  };
+
+  const handleUpdateCustomer = (customer: CustomerCreate) => {
+    if (editingCustomer) {
+      updateMutation.mutate({
+        id: editingCustomer.id,
+        body: customer,
+      });
+    }
+  };
+
   useEffect(() => {
     setIsFormOpen(false);
   }, [isMutationSuccess]);
 
   const handleSaveCustomer = (customer: CustomerCreate) => {
     mutate({
-      body: {
-        name: customer.name,
-        date_of_birth: customer.date_of_birth,
-        gender: customer.gender,
-        allergies: customer.allergies,
-        preferences: customer.preferences,
-        alternate_email: customer.alternate_email,
-        alternate_mobile_number: customer.alternate_mobile_number,
-        email: customer.email,
-        mobile_number: customer.mobile_number,
-      },
+      body: customer,
     });
   };
 
@@ -82,16 +97,32 @@ function RouteComponent() {
           </Button>
         </div>
         {/* Table Section */}
-        <CustomerTable customers={customerData} />
+        <CustomerTable
+          handleEdit={handleEditingCustomer}
+          handleDelete={handleDeleteCustomer}
+          customers={customerData}
+        />
       </div>
-      <SheetFormContainer
-        onOpenChange={setIsFormOpen}
-        onSave={handleSaveCustomer}
-        FormComponent={CustomerForm}
-        title={"Add New Customer"}
-        subtitle="Fill in the details to add new customer."
-        open={isFormOpen}
-      />
+      {editingCustomer ? (
+        <SheetFormContainer
+          defaultValues={editingCustomer}
+          onOpenChange={setIsFormOpen}
+          onSave={handleUpdateCustomer}
+          FormComponent={CustomerForm}
+          title={`Edit Customer ${editingCustomer.name}`}
+          subtitle="editing the details and save."
+          open={isFormOpen}
+        />
+      ) : (
+        <SheetFormContainer
+          onOpenChange={setIsFormOpen}
+          onSave={handleSaveCustomer}
+          FormComponent={CustomerForm}
+          title={"Add New Customer"}
+          subtitle="Fill in the details to add new customer."
+          open={isFormOpen}
+        />
+      )}
     </>
   );
 }

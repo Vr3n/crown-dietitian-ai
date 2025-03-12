@@ -1,7 +1,7 @@
 import { flexRender, type ColumnDef } from "@tanstack/react-table";
-import { Customer } from "../types";
+import { Customer, CustomerCreate } from "../types";
 import { format } from "date-fns";
-import { ChevronDown, Edit2Icon } from "lucide-react";
+import { ChevronDown, Edit2Icon, Trash2 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { toast } from "sonner";
 import { Badge } from "~/components/ui/badge";
@@ -23,78 +23,130 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-
-const handleEdit = (customer: Customer) => {
-  toast(`Editing customer: ${customer.name}`);
-};
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "~/components/ui/alert-dialog";
 
 // Defining columns for the table.
-const columns: ColumnDef<Customer>[] = [
-  {
-    accessorKey: "name",
-    header: "Name",
-    cell: ({ row }) => (
-      <div className="font-medium">{row.getValue("name")}</div>
-    ),
-  },
-  {
-    accessorKey: "date_of_birth",
-    header: "Date of Birth",
-    cell: ({ row }) => {
-      const date = row.getValue("date_of_birth") as Date | null;
-      return date ? format(date, "PPP") : "N/A";
-    },
-  },
-  {
-    accessorKey: "gender",
-    header: "Gender",
-    cell: ({ row }) => {
-      const gender = row.getValue("gender") as string;
-      return (
-        <Badge
-          variant="default"
-          className={gender === "male" ? "bg-blue-600" : "bg-pink-400"}
-        >
-          {gender}
-        </Badge>
-      );
-    },
-  },
-  {
-    accessorKey: "mobile_number",
-    header: "Mobile Number",
-    cell: ({ row }) => row.getValue("mobile_number"),
-  },
-  {
-    accessorKey: "email",
-    header: "Email",
-    cell: ({ row }) => row.getValue("email") || "N/A",
-  },
-  {
-    id: "actions",
-    cell: ({ row }) => {
-      const customer = row.original;
 
-      return (
-        <Button
-          variant="secondary"
-          size="sm"
-          className="cursor-pointer"
-          onClick={() => handleEdit(customer)}
-        >
-          <Edit2Icon />
-          Edit
-        </Button>
-      );
-    },
-  },
-];
+type GetColumnProps = {
+  handleDelete: (id: string) => void;
+  handleEdit: (customer: Customer) => void;
+};
 
-type CustomerTableProps = {
+const getColumns = ({
+  handleDelete,
+  handleEdit,
+}: GetColumnProps): ColumnDef<Customer>[] => {
+  return [
+    {
+      accessorKey: "name",
+      header: "Name",
+      cell: ({ row }) => row.getValue("name"),
+    },
+    {
+      accessorKey: "date_of_birth",
+      header: "Date of Birth",
+      cell: ({ row }) => {
+        const date = row.getValue("date_of_birth") as Date | null;
+        return date ? format(date, "PPP") : "N/A";
+      },
+    },
+    {
+      accessorKey: "gender",
+      header: "Gender",
+      cell: ({ row }) => {
+        const gender = row.getValue("gender") as string;
+        return (
+          <Badge
+            variant="default"
+            className={gender === "male" ? "bg-blue-600" : "bg-pink-400"}
+          >
+            {gender}
+          </Badge>
+        );
+      },
+    },
+    {
+      accessorKey: "mobile_number",
+      header: "Mobile Number",
+      cell: ({ row }) => row.getValue("mobile_number"),
+    },
+    {
+      accessorKey: "email",
+      header: "Email",
+      cell: ({ row }) => row.getValue("email") || "N/A",
+    },
+    {
+      id: "edit",
+      cell: ({ row }) => {
+        const customer = row.original;
+
+        return (
+          <Button
+            variant="outline"
+            className="cursor-pointer"
+            onClick={() => handleEdit(customer)}
+          >
+            <Edit2Icon />
+            Edit
+          </Button>
+        );
+      },
+    },
+    {
+      id: "delete",
+      cell: ({ row }) => {
+        const customer = row.original;
+
+        return (
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" className="cursor-pointer">
+                <Trash2 />
+                Delete
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete
+                  your account and remove your data from our servers.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={() => handleDelete(customer.id)}>
+                  Continue
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        );
+      },
+    },
+  ];
+};
+
+type CustomerTableProps = GetColumnProps & {
   customers: Customer[];
 };
 
-function CustomerTable({ customers }: CustomerTableProps) {
+function CustomerTable({
+  customers,
+  handleDelete,
+  handleEdit,
+}: CustomerTableProps) {
+  const columns = getColumns({ handleDelete, handleEdit });
   const { table } = useTable({ customers, columns });
 
   return (
