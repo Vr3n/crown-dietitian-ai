@@ -1,43 +1,20 @@
-import { z } from "zod";
 import { useForm } from "@tanstack/react-form";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
+import { Label } from "~/components/ui/label";
+import { Input } from "~/components/ui/input";
 import { format } from "date-fns";
-import { Button } from "./ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Button } from "~/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "~/components/ui/popover";
 import { cn } from "~/lib/utils";
 import { CalendarIcon, CheckCircle2, Loader2 } from "lucide-react";
-import { Calendar } from "./ui/calendar";
-import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
+import { Calendar } from "~/components/ui/calendar";
+import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 
 import type { CustomerCreate } from "~/customers/types";
-
-const customerSchema = z.object({
-  name: z.string().min(2, { message: "Name is required." }),
-  date_of_birth: z
-    .string()
-    .refine(
-      (date) => !isNaN(Date.parse(date)),
-      "Invalid date format (expected yyyy-MM-dd)"
-    ),
-  gender: z.enum(["male", "female", "OTHER"]),
-  email: z.string().email("Invalid email format").nullable().or(z.literal("")),
-  alternate_email: z
-    .string()
-    .email("Invalid email format")
-    .nullable()
-    .or(z.literal("")),
-  mobile_number: z
-    .string()
-    .regex(/^\d{10}$/, "Mobile Number must be 10 digits"),
-  alternate_mobile_number: z
-    .string()
-    .regex(/^\d{10}$/, "Mobile Number must be 10 digits")
-    .nullable()
-    .or(z.literal("")),
-  allergies: z.object({}),
-  preferences: z.object({}),
-});
+import { customerSchema } from "../schemas";
 
 type CustomerFormProps = {
   onOpenChange: (open: boolean) => void;
@@ -73,7 +50,6 @@ export function CustomerForm({ onOpenChange, onSave }: CustomerFormProps) {
       onSave(formattedValues as CustomerCreate);
     },
     validators: {
-      onMount: customerSchema,
       onChange: customerSchema,
     },
   });

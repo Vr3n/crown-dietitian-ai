@@ -4,19 +4,10 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "./ui/sheet";
+} from "../ui/sheet";
+import { FormContainerProps } from "./types";
 
-type FormSheetProps<T> = {
-  open: boolean;
-  title: string;
-  subtitle: string;
-  FormComponent: React.ComponentType<{
-    onOpenChange: (open: boolean) => void;
-    onSave: (payload: T) => void;
-  }>;
-  onOpenChange: (open: boolean) => void;
-  onSave: (payload: T) => void;
-};
+type FormSheetProps<T> = FormContainerProps<T>;
 
 function SheetFormContainer<T>({
   title,
