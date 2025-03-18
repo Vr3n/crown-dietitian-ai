@@ -24,7 +24,7 @@ export async function handleRepsonse<T>(response: Response): Promise<T> {
     throw new ApiError(
       response.status,
       `API error: ${response.status} ${response.statusText}`,
-      data
+      data,
     );
   }
 

@@ -6,8 +6,12 @@ export type FormContainerProps<T> = {
     onOpenChange: (open: boolean) => void;
     onSave: (payload: T) => void;
     defaultValues?: T;
+    isEditing?: boolean;
+    isSaving?: boolean;
   }>;
   defaultValues?: T;
   onOpenChange: (open: boolean) => void;
   onSave: (payload: T) => void;
+  isEditing?: boolean;
+  isSaving?: boolean;
 };

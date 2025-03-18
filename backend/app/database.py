@@ -11,6 +11,6 @@ engine = create_async_engine(settings.DATABASE_URL,
 async_session = AsyncSession(engine,)
 
 
-async def get_session() -> AsyncSession: # type: ignore
+async def get_session() -> AsyncSession:  # type: ignore
     async with async_session as session:
-        yield session # type: ignore
+        yield session  # type: ignore

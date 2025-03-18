@@ -11,7 +11,7 @@ export const customerFetchClient = {
         headers: {
           "Content-Type": "application/json",
         },
-      }
+      },
     );
     return handleRepsonse<Customer[]>(response);
   },
@@ -67,7 +67,7 @@ export const customerQueries = {
   getCustomers: (params: PaginationParams = { skip: 0, limit: 100 }) => ({
     queryKey: customerKeys.list(params),
     queryFn: () => customerFetchClient.getCustomers(params),
-    staleTime: 5 * 60 * 1000,
+    staleTime: 5000,
   }),
 };
 

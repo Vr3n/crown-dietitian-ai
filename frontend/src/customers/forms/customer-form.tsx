@@ -20,6 +20,8 @@ type CustomerFormProps = {
   onOpenChange: (open: boolean) => void;
   onSave: (customer: CustomerCreate) => void;
   defaultValues?: CustomerCreate;
+  isEditing?: boolean;
+  isSaving?: boolean;
 };
 
 const defaultCustomerValues = {
@@ -38,6 +40,8 @@ export function CustomerForm({
   onOpenChange,
   onSave,
   defaultValues = defaultCustomerValues,
+  isEditing = false,
+  isSaving = false,
 }: CustomerFormProps) {
   const form = useForm({
     defaultValues: defaultValues,
@@ -114,7 +118,7 @@ export function CustomerForm({
                         variant="outline"
                         className={cn(
                           "w-full justify-start text-left font-normal",
-                          !field.state.value && "text-muted-foreground"
+                          !field.state.value && "text-muted-foreground",
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
@@ -321,10 +325,10 @@ export function CustomerForm({
             state.isSubmitSuccessful,
           ]}
           children={([canSubmit, isSubmitting, isSubmitSuccessful]) => (
-            <Button disabled={!canSubmit} type="submit">
-              Add Customer
+            <Button disabled={!canSubmit || isSaving} type="submit">
+              {isEditing ? "Edit" : "Add"} Customer
               {isSubmitting && <Loader2 className="animate-spin" />}
-              {isSubmitSuccessful && <CheckCircle2 className="bg-green-400" />}
+              {isSaving && <Loader2 className="animate-spin" />}
             </Button>
           )}
         />

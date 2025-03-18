@@ -38,7 +38,11 @@ function RouteComponent() {
     isError,
   } = useCustomersQuery({ skip: 0, limit: 100 });
 
-  const { mutate, isSuccess: isMutationSuccess } = useCreateCustomerMutation();
+  const {
+    mutate,
+    isSuccess: isMutationSuccess,
+    isPending: isCustomerCreatePending,
+  } = useCreateCustomerMutation();
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
@@ -72,7 +76,7 @@ function RouteComponent() {
 
   useEffect(() => {
     setIsFormOpen(false);
-  }, [isMutationSuccess]);
+  }, [isMutationSuccess, updateMutation.isSuccess]);
 
   const handleSaveCustomer = (customer: CustomerCreate) => {
     mutate({
@@ -103,23 +107,28 @@ function RouteComponent() {
           customers={customerData}
         />
       </div>
-      {editingCustomer ? (
+      {isFormOpen && (
         <SheetFormContainer
-          defaultValues={editingCustomer}
+          isEditing={!!editingCustomer}
+          defaultValues={editingCustomer || undefined}
           onOpenChange={setIsFormOpen}
-          onSave={handleUpdateCustomer}
+          onSave={editingCustomer ? handleUpdateCustomer : handleSaveCustomer}
           FormComponent={CustomerForm}
-          title={`Edit Customer ${editingCustomer.name}`}
-          subtitle="editing the details and save."
-          open={isFormOpen}
-        />
-      ) : (
-        <SheetFormContainer
-          onOpenChange={setIsFormOpen}
-          onSave={handleSaveCustomer}
-          FormComponent={CustomerForm}
-          title={"Add New Customer"}
-          subtitle="Fill in the details to add new customer."
+          isSaving={
+            updateMutation.isPending ||
+            deleteMutation.isPending ||
+            isCustomerCreatePending
+          }
+          title={
+            editingCustomer
+              ? `Edit Customer ${editingCustomer.name}`
+              : "Add new Customer"
+          }
+          subtitle={
+            editingCustomer
+              ? "editing the details and save."
+              : "Fill the fields and add."
+          }
           open={isFormOpen}
         />
       )}

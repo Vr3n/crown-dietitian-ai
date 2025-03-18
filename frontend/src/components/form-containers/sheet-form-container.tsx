@@ -17,6 +17,8 @@ function SheetFormContainer<T>({
   onOpenChange,
   onSave,
   defaultValues,
+  isEditing = false,
+  isSaving = false,
 }: FormSheetProps<T>) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -26,6 +28,8 @@ function SheetFormContainer<T>({
           <SheetDescription>{subtitle}</SheetDescription>
         </SheetHeader>
         <FormComponent
+          isSaving={isSaving}
+          isEditing={isEditing}
           defaultValues={defaultValues}
           onOpenChange={onOpenChange}
           onSave={onSave}
