@@ -72,7 +72,7 @@ function RouteComponent() {
 
   useEffect(() => {
     setIsFormOpen(false);
-  }, [isMutationSuccess]);
+  }, [isMutationSuccess, updateMutation.isSuccess]);
 
   const handleSaveCustomer = (customer: CustomerCreate) => {
     mutate({
@@ -105,6 +105,7 @@ function RouteComponent() {
       </div>
       {editingCustomer ? (
         <SheetFormContainer
+          isEditing={true}
           defaultValues={editingCustomer}
           onOpenChange={setIsFormOpen}
           onSave={handleUpdateCustomer}
