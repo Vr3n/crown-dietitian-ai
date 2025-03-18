@@ -1,5 +1,4 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { toast } from "sonner";
+import { createFileRoute } from "@tanstack/react-router";
 
 import { Button } from "~/components/ui/button";
 import { PlusCircle } from "lucide-react";
@@ -32,11 +31,10 @@ function RouteComponent() {
   const initialData = Route.useLoaderData() as Customer[];
 
   // Keeping the query active to enable background refetching.
-  const {
-    data: customerData = initialData,
-    isLoading,
-    isError,
-  } = useCustomersQuery({ skip: 0, limit: 100 });
+  const { data: customerData = initialData } = useCustomersQuery({
+    skip: 0,
+    limit: 100,
+  });
 
   const {
     mutate,

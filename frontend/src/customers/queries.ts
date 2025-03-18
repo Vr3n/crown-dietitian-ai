@@ -57,8 +57,8 @@ export const customerFetchClient = {
 export const customerKeys = {
   all: ["customers"] as const,
   lists: () => [...customerKeys.all, "list"] as const,
-  list: (filters: PaginationParams) =>
-    [...customerKeys.lists(), filters] as const,
+  list: ({ skip = 0, limit = 0 }: PaginationParams) =>
+    [...customerKeys.lists(), { skip, limit }] as const,
   details: () => [...customerKeys.all, "detail"] as const,
   detail: (id: string) => [...customerKeys.details(), id] as const,
 };
