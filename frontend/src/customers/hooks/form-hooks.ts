@@ -2,16 +2,18 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "~/main";
 import { CustomerCreate } from "../types";
 import { customerFetchClient, customerKeys, customerQueries } from "../queries";
-import { PaginationParams } from "~/fetchClient";
 import { toast } from "sonner";
 
-export const useCreateCustomerMutation = (skip = 0, limit = 10) => {
+export const useCreateCustomerMutation = () => {
   return useMutation({
     mutationFn: (data: { body: CustomerCreate }) =>
       customerFetchClient.createCustomer(data.body),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: customerKeys.all });
-      toast.success("Customer Added Successfully!");
+      queryClient
+        .invalidateQueries({ queryKey: customerKeys.lists() })
+        .then(() => {
+          toast.success("Customer Added Successfully!");
+        });
     },
     onError: (error, _, __) => {
       toast.error("Failed to add customer, Please try again.");
@@ -19,17 +21,14 @@ export const useCreateCustomerMutation = (skip = 0, limit = 10) => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({
-        queryKey: customerKeys.list({ skip, limit }),
+        queryKey: customerKeys.lists(),
       });
     },
   });
 };
 
-export const useCustomersQuery = ({
-  skip = 0,
-  limit = 100,
-}: PaginationParams) => {
-  return useQuery({ ...customerQueries.getCustomers({ skip, limit }) });
+export const useCustomersQuery = () => {
+  return useQuery({ ...customerQueries.getCustomers() });
 };
 
 export const useDeleteCustomerMutation = () => {
@@ -40,8 +39,9 @@ export const useDeleteCustomerMutation = () => {
       queryClient.removeQueries({ queryKey: customerKeys.detail(deletedId) });
 
       // Invalidate list queries.
-      queryClient.invalidateQueries({ queryKey: customerKeys.lists() });
-      toast.success("Customer Deleted Successfully!");
+      queryClient.invalidateQueries({ queryKey: customerKeys.all }).then(() => {
+        toast.success("Customer Deleted Successfully!");
+      });
     },
     onError: (error, _, __) => {
       toast.error("Failed to delete customer. Please try again.");
@@ -66,9 +66,11 @@ export const useUpdateCustomerMutation = () => {
       );
 
       // invalidate the list queries as the might be affected.
-      queryClient.invalidateQueries({ queryKey: customerKeys.lists() });
-
-      toast.success("Customer Updated Successfully!");
+      queryClient
+        .invalidateQueries({ queryKey: customerKeys.lists() })
+        .then(() => {
+          toast.success("Customer Updated Successfully!");
+        });
     },
     onError(error, _, __) {
       toast.error("Failed to updated customer. Please try again.");
