@@ -1,8 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "~/main";
-import { Customer, CustomerCreate } from "../types";
+import { CustomerCreate } from "../types";
 import { customerFetchClient, customerKeys, customerQueries } from "../queries";
-import { PaginationParams } from "~/fetchClient";
 import { toast } from "sonner";
 
 export const useCreateCustomerMutation = () => {
@@ -10,51 +9,41 @@ export const useCreateCustomerMutation = () => {
     mutationFn: (data: { body: CustomerCreate }) =>
       customerFetchClient.createCustomer(data.body),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: customerKeys.all });
+      queryClient
+        .invalidateQueries({ queryKey: customerKeys.lists() })
+        .then(() => {
+          toast.success("Customer Added Successfully!");
+        });
+    },
+    onError: (error, _, __) => {
+      toast.error("Failed to add customer, Please try again.");
+      console.log("erorr creating customer: ", error);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: customerKeys.lists(),
+      });
     },
   });
 };
 
-export const useCustomersQuery = ({
-  skip = 0,
-  limit = 100,
-}: PaginationParams) => {
-  return useQuery(customerQueries.getCustomers({ skip, limit }));
+export const useCustomersQuery = () => {
+  return useQuery({ ...customerQueries.getCustomers() });
 };
 
 export const useDeleteCustomerMutation = () => {
   return useMutation({
     mutationFn: (id: string) => customerFetchClient.deleteCustomer(id),
-    onMutate: async (id) => {
-      await queryClient.cancelQueries({ queryKey: customerKeys.lists() });
-
-      // Snapshot previous list data.
-      const previousCustomers = queryClient.getQueryData(customerKeys.lists());
-
-      // Optimistically remove the customer from the list.
-      queryClient.setQueryData(customerKeys.lists(), (old: Customer[]) =>
-        old ? old.filter((customer: Customer) => customer.id !== id) : [],
-      );
-
-      return { previousCustomers };
-    },
     onSuccess: (_, deletedId) => {
       // Invalidate Detail customer queries.
       queryClient.removeQueries({ queryKey: customerKeys.detail(deletedId) });
 
       // Invalidate list queries.
-      queryClient.invalidateQueries({ queryKey: customerKeys.lists() });
-      toast.success("Customer Deleted Successfully!");
+      queryClient.invalidateQueries({ queryKey: customerKeys.all }).then(() => {
+        toast.success("Customer Deleted Successfully!");
+      });
     },
-    onError: (error, _, context) => {
-      // Rollback on erorr.
-      if (context?.previousCustomers) {
-        queryClient.setQueryData(
-          customerKeys.lists(),
-          context.previousCustomers,
-        );
-      }
-
+    onError: (error, _, __) => {
       toast.error("Failed to delete customer. Please try again.");
       console.log("error during fetch: ", error);
     },
@@ -69,20 +58,6 @@ export const useUpdateCustomerMutation = () => {
   return useMutation({
     mutationFn: ({ id, body }: { id: string; body: Partial<CustomerCreate> }) =>
       customerFetchClient.updateCustomer(id, body),
-    onMutate: async ({ id, body }) => {
-      await queryClient.cancelQueries({ queryKey: customerKeys.detail(id) });
-
-      const previousCustomer: Customer | undefined = queryClient.getQueryData(
-        customerKeys.detail(id),
-      );
-
-      queryClient.setQueryData(customerKeys.detail(id), (old: Customer) => ({
-        ...old,
-        ...body,
-      }));
-
-      return { previousCustomer };
-    },
     onSuccess: (updatedCustomer) => {
       // update the specific customer in the cache.
       queryClient.setQueryData(
@@ -91,19 +66,13 @@ export const useUpdateCustomerMutation = () => {
       );
 
       // invalidate the list queries as the might be affected.
-      queryClient.invalidateQueries({ queryKey: customerKeys.lists() });
-
-      toast.success("Customer Updated Successfully!");
+      queryClient
+        .invalidateQueries({ queryKey: customerKeys.lists() })
+        .then(() => {
+          toast.success("Customer Updated Successfully!");
+        });
     },
-    onError(error, _, context) {
-      // Rollback on error.
-      if (context?.previousCustomer) {
-        queryClient.setQueryData(
-          customerKeys.detail(context.previousCustomer.id),
-          context.previousCustomer,
-        );
-      }
-
+    onError(error, _, __) {
       toast.error("Failed to updated customer. Please try again.");
       console.log("Update customer error: ", error);
     },

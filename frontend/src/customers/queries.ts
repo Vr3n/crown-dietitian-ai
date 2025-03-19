@@ -3,9 +3,9 @@ import { Customer, CustomerCreate } from "./types";
 import { QueryClient } from "@tanstack/react-query";
 
 export const customerFetchClient = {
-  getCustomers: async ({ skip = 0, limit = 0 }: PaginationParams) => {
+  getCustomers: async (params: PaginationParams = { skip: 0, limit: 100 }) => {
     const response = await fetch(
-      `${BASE_URL}/customers/?skip=${skip}&limit=${limit}`,
+      `${BASE_URL}/customers/?skip=${params.skip}&limit=${params.limit}`,
       {
         method: "GET",
         headers: {
@@ -57,17 +57,16 @@ export const customerFetchClient = {
 export const customerKeys = {
   all: ["customers"] as const,
   lists: () => [...customerKeys.all, "list"] as const,
-  list: (filters: PaginationParams) =>
-    [...customerKeys.lists(), filters] as const,
   details: () => [...customerKeys.all, "detail"] as const,
   detail: (id: string) => [...customerKeys.details(), id] as const,
 };
 
 export const customerQueries = {
-  getCustomers: (params: PaginationParams = { skip: 0, limit: 100 }) => ({
-    queryKey: customerKeys.list(params),
-    queryFn: () => customerFetchClient.getCustomers(params),
-    staleTime: 5000,
+  getCustomers: () => ({
+    queryKey: customerKeys.lists(),
+    queryFn: () => customerFetchClient.getCustomers(),
+    keepPreviousData: true,
+    staleTime: 50000,
   }),
 };
 

@@ -319,12 +319,8 @@ export function CustomerForm({
           Cancel
         </Button>
         <form.Subscribe
-          selector={(state) => [
-            state.canSubmit,
-            state.isSubmitting,
-            state.isSubmitSuccessful,
-          ]}
-          children={([canSubmit, isSubmitting, isSubmitSuccessful]) => (
+          selector={(state) => [state.canSubmit, state.isSubmitting]}
+          children={([canSubmit, isSubmitting]) => (
             <Button disabled={!canSubmit || isSaving} type="submit">
               {isEditing ? "Edit" : "Add"} Customer
               {isSubmitting && <Loader2 className="animate-spin" />}
