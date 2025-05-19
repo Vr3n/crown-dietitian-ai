@@ -31,10 +31,7 @@ function RouteComponent() {
   const initialData = Route.useLoaderData() as Customer[];
 
   // Keeping the query active to enable background refetching.
-  const { data: customerData = initialData } = useCustomersQuery({
-    skip: 0,
-    limit: 100,
-  });
+  const { data: customerData = initialData } = useCustomersQuery();
 
   const {
     mutate,

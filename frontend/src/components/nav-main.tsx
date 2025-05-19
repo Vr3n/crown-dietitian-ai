@@ -1,78 +1,65 @@
 import { Link } from "@tanstack/react-router";
-import { ChevronRight, type LucideIcon } from "lucide-react";
-
+import { Apple, Calendar, ChevronRight, DumbbellIcon, HomeIcon, Users, type LucideIcon } from "lucide-react";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "~/components/ui/collapsible";
-import {
+  SidebarContent,
   SidebarGroup,
-  SidebarGroupLabel,
+  SidebarGroupContent,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
 } from "~/components/ui/sidebar";
 
-type NavMainTypes = {
-  items: {
-    title: string;
-    url: string;
-    icon?: LucideIcon;
-    isActive?: boolean;
-    items?: {
-      title: string;
-      url: string;
-    }[];
-  }[];
-};
-
-export function NavMain({ items }: NavMainTypes) {
+export function NavMain() {
   return (
-    <SidebarGroup>
-      <SidebarGroupLabel>Clients</SidebarGroupLabel>
-      <SidebarMenu>
-        {items.map((item) => (
-          <Collapsible
-            key={item.title}
-            asChild
-            defaultOpen={item.isActive}
-            className="group/collapsible"
-          >
-            <SidebarMenuItem>
-              <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip={item.title}>
-                  {item.icon && <item.icon />}
-                  <span>{item.title}</span>
-                  <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                </SidebarMenuButton>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <SidebarMenuSub>
-                  {item.items?.map((subItem) => (
-                    <SidebarMenuSubItem key={subItem.title}>
-                      <SidebarMenuSubButton asChild>
-                        <Link
-                          to={subItem.url}
-                          activeProps={{
-                            className: "font-bold",
-                          }}
-                          activeOptions={{ exact: true }}
-                        >
-                          {subItem.title}
-                        </Link>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  ))}
-                </SidebarMenuSub>
-              </CollapsibleContent>
+    <SidebarMenu>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+
+            <SidebarMenuItem key={"Home"}>
+              <SidebarMenuButton asChild>
+                <Link to={"/"}>
+                  <HomeIcon />
+                  <span>Home</span>
+                </Link>
+              </SidebarMenuButton>
             </SidebarMenuItem>
-          </Collapsible>
-        ))}
-      </SidebarMenu>
-    </SidebarGroup>
+            <SidebarMenuItem key={"Customers"}>
+              <SidebarMenuButton asChild>
+                <Link to={"/clients"}>
+                  <Users />
+                  <span>Customers</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem key={"Diets"}>
+              <SidebarMenuButton asChild>
+                <Link to={"/diets"}>
+                  <Apple />
+                  <span>Diets</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem key={"Sessions"}>
+              <SidebarMenuButton asChild>
+                <Link to={"/sessions"}>
+                  <Calendar />
+                  <span>Sessions</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem key={"Workous"}>
+              <SidebarMenuButton asChild>
+                <Link to={"/workouts"}>
+                  <DumbbellIcon />
+                  <span>Workouts</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+    </SidebarMenu>
   );
 }
